@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exercice — Voir, dire, tracer</title>
+<style>
+
+:root{--prune:#8C1E70;--prune-fonce:#5E1349;--prune-clair:#F4E6EE;--accent:#C77BAA;
+ --vert:#283C28;--gris:#3C3C3C;--gris-moyen:#8A7A85;--filet:#E8DCE5;--creme:#FAF6F8;
+ --ok:#2F7A4F;--ko:#B23B3B;--amb:#B5852A;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--creme);color:var(--gris);
+ font-family:"Nunito","Segoe UI",Helvetica,Arial,sans-serif;font-size:16px;line-height:1.62}
+.wrap{max-width:900px;margin:0 auto;padding:0 18px 60px}
+header.bandeau{background:var(--prune-fonce);color:#fff;padding:18px 0;border-bottom:4px solid var(--accent)}
+header.bandeau .wrap{padding-bottom:0}
+.chapitre{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:#EAD3E3}
+.chapitre span{color:var(--accent);margin:0 6px}
+h1{font-family:Georgia,"Times New Roman",serif;font-size:27px;line-height:1.25;margin:8px 0 4px;color:#fff}
+.sous{color:#EAD3E3;font-size:14.5px;margin:0}
+h2{font-family:Georgia,"Times New Roman",serif;font-size:20px;color:var(--prune-fonce);
+ margin:34px 0 0;padding-bottom:8px;border-bottom:2px solid var(--filet)}
+h2 .num{color:var(--accent);margin-right:8px}
+h3{font-size:15px;color:var(--vert);margin:20px 0 8px;letter-spacing:.02em}
+.carte{background:#fff;border:1px solid var(--filet);border-radius:10px;padding:20px 22px;margin:18px 0;
+ box-shadow:0 1px 2px rgba(94,19,73,.05)}
+.enc{background:var(--prune-clair);border-left:5px solid var(--prune);padding:14px 18px;
+ border-radius:0 8px 8px 0;margin:18px 0;font-size:15.2px}
+.enc .t{display:block;font-size:11.5px;letter-spacing:.11em;text-transform:uppercase;
+ font-weight:800;color:var(--prune-fonce);margin-bottom:6px}
+.enc.al{background:#FBF4F4;border-left-color:var(--ko)}.enc.al .t{color:var(--ko)}
+.enc.ci{background:#FCF8F0;border-left-color:var(--amb)}.enc.ci .t{color:#8A6418}
+.situ{background:#FCF9FB;border:1px dashed var(--filet);border-radius:8px;padding:16px 18px;margin:16px 0;font-size:15.2px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.duo>div{background:#fff;border:1px solid var(--filet);border-radius:9px;padding:15px 17px;font-size:14.8px}
+.duo .h{font-weight:800;color:var(--prune-fonce);margin-bottom:7px;font-size:14.5px}
+.tri{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.tri>div{background:#fff;border:1px solid var(--filet);border-radius:9px;padding:14px 15px;font-size:14.3px}
+.quad{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.quad>div{background:#fff;border:1px solid var(--filet);border-radius:9px;padding:12px 13px;font-size:13.6px}
+.quad .h{font-weight:800;color:var(--prune-fonce);margin-bottom:6px;font-size:13px;
+ text-transform:uppercase;letter-spacing:.04em}
+.tri .h{font-weight:800;color:var(--prune-fonce);margin-bottom:6px;font-size:13.5px;
+ text-transform:uppercase;letter-spacing:.05em}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.8px;background:#fff}
+th,td{border:1px solid var(--filet);padding:9px 12px;text-align:left}
+thead th{background:var(--prune-clair);color:var(--prune-fonce);font-size:13.5px}
+tbody th{font-weight:600;color:var(--gris)}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.tot td,tr.tot th{background:#FBF3F8;font-weight:800;color:var(--prune-fonce)}
+.dl{display:inline-flex;align-items:center;gap:9px;background:var(--prune);color:#fff;text-decoration:none;
+ padding:11px 20px;border-radius:8px;font-weight:700;font-size:15px;margin:20px 0 4px}
+.dl:hover{background:var(--prune-fonce)}
+ol.q{padding-left:0;list-style:none;counter-reset:q}
+ol.q>li{margin:16px 0;padding-left:38px;position:relative}
+ol.q>li::before{counter-increment:q;content:counter(q);position:absolute;left:0;top:1px;
+ width:26px;height:26px;border-radius:50%;background:var(--prune-clair);color:var(--prune-fonce);
+ font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+b,strong{color:var(--vert)}
+footer{text-align:center;font-size:12.5px;color:var(--gris-moyen);padding:26px 18px 12px;
+ border-top:1px solid var(--filet);margin-top:44px}
+@media(max-width:860px){.quad{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.duo,.tri,.quad{grid-template-columns:1fr}h1{font-size:22px}}
+@media print{body{background:#fff}.dl{display:none}header.bandeau{background:#5E1349 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+
+.champ{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:11px 0;
+ padding:11px 13px;background:#FCF9FB;border:1px solid var(--filet);border-radius:9px}
+.champ .lb{flex:1 1 340px;font-size:15px}
+.champ .pts{font-size:12px;color:var(--gris-moyen);white-space:nowrap}
+input.num,select.ch{font-family:inherit;font-size:15px;padding:9px 12px;border:1.5px solid var(--filet);
+ border-radius:8px;background:#fff;color:var(--gris);min-width:210px}
+input.num{min-width:150px;text-align:right;font-variant-numeric:tabular-nums}
+input.num:focus,select.ch:focus{outline:none;border-color:var(--prune)}
+input.num:disabled,select.ch:disabled{background:#F1EBEF;color:var(--gris-moyen);cursor:not-allowed}
+.champ.just{border-color:#BFE0CC;background:#F3FAF5}
+.champ.faux{border-color:#EFC9C9;background:#FDF5F5}
+.verdict{font-weight:800;font-size:13px;white-space:nowrap}
+.verdict.ok{color:var(--ok)}.verdict.ko{color:var(--ko)}
+.btn{display:inline-flex;align-items:center;gap:9px;background:var(--prune);color:#fff;border:0;
+ padding:12px 22px;border-radius:8px;font-family:inherit;font-weight:800;font-size:15px;cursor:pointer}
+.btn:hover{background:var(--prune-fonce)}
+.btn:disabled{background:#C9B7C3;cursor:not-allowed}
+.btn.sec{background:#fff;color:var(--prune-fonce);border:1.5px solid var(--filet)}
+.btn.sec:hover{background:var(--prune-clair)}
+.barre{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:16px}
+.fige{display:inline-block;font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;
+ color:var(--prune-fonce);background:var(--prune-clair);padding:6px 11px;border-radius:20px}
+.corr{display:none;margin-top:16px}.corr.on{display:block}
+.score{display:flex;flex-wrap:wrap;gap:18px;align-items:baseline;
+ background:var(--prune-fonce);color:#fff;border-radius:10px;padding:18px 22px;margin:18px 0}
+.score .gros{font-family:Georgia,serif;font-size:32px;font-weight:700;color:#fff}
+.score .lib{font-size:14px;color:#EAD3E3}
+.opt{display:block;background:#fff;border:1.5px solid var(--filet);border-radius:9px;
+ padding:11px 14px;margin:8px 0;font-size:15px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt input{margin-right:10px}
+.opt.sel{border-color:var(--prune);background:var(--prune-clair)}
+.opt.bonne{border-color:var(--ok);background:#F3FAF5}
+.opt.mauvaise{border-color:var(--ko);background:#FDF5F5}
+.opt.verrou{cursor:not-allowed}
+.qbloc{background:#fff;border:1px solid var(--filet);border-radius:10px;padding:18px 20px;margin:16px 0}
+.qnum{font-size:11.5px;letter-spacing:.11em;text-transform:uppercase;font-weight:800;color:var(--accent)}
+.qth{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;
+ color:var(--prune-fonce);background:var(--prune-clair);padding:4px 9px;border-radius:20px;margin-left:8px}
+.qen{font-size:16.5px;font-weight:700;color:var(--vert);margin:8px 0 4px}
+.multi{font-size:12.5px;color:var(--gris-moyen);font-style:italic;margin-bottom:6px}
+.prog{height:8px;background:var(--filet);border-radius:20px;overflow:hidden;margin:14px 0 4px}
+.prog i{display:block;height:100%;background:var(--prune);width:0;transition:width .25s}
+.sticky{position:sticky;bottom:0;background:var(--creme);padding:12px 0;border-top:1px solid var(--filet)}
+@media print{.btn,.sticky{display:none}}
+
+
+.phrase{flex:1 1 360px;font-size:15.5px}
+.phrase .trou{display:inline-block;min-width:70px;border-bottom:2px dotted var(--accent);text-align:center;color:var(--accent);font-weight:800}
+select.ch{min-width:170px}
+
+.redac{width:100%;font-family:inherit;font-size:15px;line-height:1.6;padding:12px 14px;border:1.5px solid var(--filet);
+ border-radius:9px;background:#fff;color:var(--gris);resize:vertical;margin-top:8px}
+.redac:focus{outline:none;border-color:var(--prune)}
+.redac:disabled{background:#F1EBEF;color:var(--gris-moyen)}
+.cpt{font-size:12.5px;color:var(--gris-moyen);margin-top:5px}
+.modele{display:none;margin-top:12px}.modele.on{display:block}
+.auto label{display:block;background:#fff;border:1.5px solid var(--filet);border-radius:9px;padding:9px 13px;margin:7px 0;font-size:14.8px;cursor:pointer}
+.auto input{margin-right:9px}
+.qr{font-weight:700;color:var(--vert);margin:6px 0 0}
+</style></head>
+<body>
+<header class="bandeau"><div class="wrap">
+ <div class="chapitre">IOBSP · Savoirs généraux <span>/</span> Module 5</div><h1>Voir, dire, tracer</h1><p class="sous">Exercice d'entraînement — 5 ateliers, correction immédiate · 24 points</p>
+</div></header>
+<div class="wrap">
+
+<div class="carte">
+<div class="enc"><span class="t">CE QUE VOUS ALLEZ FAIRE</span>5 ateliers, de l'assujettissement au premier rendez-vous, puis deux restitutions écrites. <b>Une fois un atelier validé, vos réponses sont figées</b> et la correction s'affiche : lisez-la avant de passer au suivant. Vous pouvez recommencer l'exercice entier à tout moment, ce qui remet tout à zéro. Aucun résultat n'est transmis : c'est un entraînement.</div>
+<div class="enc ci"><span class="t">CONSEIL</span>Faites les quatre premiers ateliers avec la fiche mémo si besoin. Le dernier se fait sans support : c'est le moment de vérifier ce que vous avez retenu.</div>
+</div>
+
+<div id="ateliers"></div>
+<div id="final"></div>
+
+<div class="barre sticky">
+ <button class="btn sec" id="rejouer">↻ Recommencer l'exercice</button>
+ <span style="font-size:13px;color:var(--gris-moyen)">Le rejeu efface toutes les réponses et les corrections.</span>
+</div>
+
+<footer>TMK Performances - N° Siret : 49841924100027 - Code NAF : 8559A</footer>
+</div>
+<script>
+const EX = [
+ {
+  "titre": "Atelier 1 — Assujetti ou non ?",
+  "sub": "Article L. 561-2, 3° · 6 situations",
+  "consigne": "Les deux conditions sont cumulatives : mandat du client et fonds confiés. Pour chaque intermédiaire, choisissez la bonne réponse.",
+  "champs": [
+   {
+    "id": "a0q0",
+    "lb": "Un courtier qui reçoit sur son compte l'apport de ses clients avant de le reverser au notaire.",
+    "options": [
+     "Assujetti directement à la LCB-FT",
+     "Pas assujetti directement, mais concerné par le dispositif de l'établissement"
+    ],
+    "rep": 0,
+    "pts": 1
+   },
+   {
+    "id": "a0q1",
+    "lb": "Un courtier dont les fonds transitent directement entre la banque et le notaire.",
+    "options": [
+     "Assujetti directement à la LCB-FT",
+     "Pas assujetti directement, mais concerné par le dispositif de l'établissement"
+    ],
+    "rep": 1,
+    "pts": 1
+   },
+   {
+    "id": "a0q2",
+    "lb": "Une mandataire exclusive d'une banque.",
+    "options": [
+     "Assujetti directement à la LCB-FT",
+     "Pas assujetti directement, mais concerné par le dispositif de l'établissement"
+    ],
+    "rep": 1,
+    "pts": 1
+   },
+   {
+    "id": "a0q3",
+    "lb": "Un mandataire non exclusif qui reçoit occasionnellement des chèques d'apport.",
+    "options": [
+     "Assujetti directement à la LCB-FT",
+     "Pas assujetti directement, mais concerné par le dispositif de l'établissement"
+    ],
+    "rep": 1,
+    "pts": 1
+   },
+   {
+    "id": "a0q4",
+    "lb": "Une courtière qui conserve quelques jours, pour un client, le produit d'une vente.",
+    "options": [
+     "Assujetti directement à la LCB-FT",
+     "Pas assujetti directement, mais concerné par le dispositif de l'établissement"
+    ],
+    "rep": 0,
+    "pts": 1
+   },
+   {
+    "id": "a0q5",
+    "lb": "Le mandataire d'un courtier, sans aucun fonds confié.",
+    "options": [
+     "Assujetti directement à la LCB-FT",
+     "Pas assujetti directement, mais concerné par le dispositif de l'établissement"
+    ],
+    "rep": 1,
+    "pts": 1
+   }
+  ]
+ },
+ {
+  "titre": "Atelier 2 — Quelle vigilance ?",
+  "sub": "Approche par les risques · 6 dossiers",
+  "consigne": "Pour chaque dossier, choisissez la réponse adaptée.",
+  "champs": [
+   {
+    "id": "a1q0",
+    "lb": "Des clients de la banque depuis vingt ans financent des travaux avec un apport issu d'un plan d'épargne, justifié.",
+    "options": [
+     "Vigilance allégée, documentée",
+     "Vigilance normale",
+     "Vigilance renforcée",
+     "Soupçon : remonter et déclarer"
+    ],
+    "rep": 0,
+    "pts": 1
+   },
+   {
+    "id": "a1q1",
+    "lb": "Un jeune couple salarié achète sa résidence principale avec une donation de ses parents, justifiée.",
+    "options": [
+     "Vigilance allégée, documentée",
+     "Vigilance normale",
+     "Vigilance renforcée",
+     "Soupçon : remonter et déclarer"
+    ],
+    "rep": 1,
+    "pts": 1
+   },
+   {
+    "id": "a1q2",
+    "lb": "Le client est l'adjoint d'un ministre étranger.",
+    "options": [
+     "Vigilance allégée, documentée",
+     "Vigilance normale",
+     "Vigilance renforcée",
+     "Soupçon : remonter et déclarer"
+    ],
+    "rep": 2,
+    "pts": 1
+   },
+   {
+    "id": "a1q3",
+    "lb": "Un gérant de société récente apporte des espèces en trois versements et refuse d'en justifier l'origine.",
+    "options": [
+     "Vigilance allégée, documentée",
+     "Vigilance normale",
+     "Vigilance renforcée",
+     "Soupçon : remonter et déclarer"
+    ],
+    "rep": 3,
+    "pts": 1
+   },
+   {
+    "id": "a1q4",
+    "lb": "L'emprunteur réside dans un pays tiers à haut risque.",
+    "options": [
+     "Vigilance allégée, documentée",
+     "Vigilance normale",
+     "Vigilance renforcée",
+     "Soupçon : remonter et déclarer"
+    ],
+    "rep": 2,
+    "pts": 1
+   },
+   {
+    "id": "a1q5",
+    "lb": "Une infirmière achète un studio pour le louer, avec un apport tiré de son livret, relevés à l'appui.",
+    "options": [
+     "Vigilance allégée, documentée",
+     "Vigilance normale",
+     "Vigilance renforcée",
+     "Soupçon : remonter et déclarer"
+    ],
+    "rep": 1,
+    "pts": 1
+   }
+  ]
+ },
+ {
+  "titre": "Atelier 3 — Démarchage ou non ?",
+  "sub": "Les canaux de distribution · 6 contacts",
+  "consigne": "Pour chaque prise de contact, dites s'il s'agit de démarchage.",
+  "champs": [
+   {
+    "id": "a2q0",
+    "lb": "Un prospect remplit le formulaire du site et demande à être rappelé.",
+    "options": [
+     "Démarchage",
+     "Pas de démarchage"
+    ],
+    "rep": 1,
+    "pts": 1
+   },
+   {
+    "id": "a2q1",
+    "lb": "Le cabinet appelle des propriétaires tirés d'un fichier acheté pour leur proposer un regroupement de crédits.",
+    "options": [
+     "Démarchage",
+     "Pas de démarchage"
+    ],
+    "rep": 0,
+    "pts": 1
+   },
+   {
+    "id": "a2q2",
+    "lb": "Un client appelle l'agence pour prendre rendez-vous.",
+    "options": [
+     "Démarchage",
+     "Pas de démarchage"
+    ],
+    "rep": 1,
+    "pts": 1
+   },
+   {
+    "id": "a2q3",
+    "lb": "Un conseiller se présente sans rendez-vous au domicile de personnes repérées dans un quartier.",
+    "options": [
+     "Démarchage",
+     "Pas de démarchage"
+    ],
+    "rep": 0,
+    "pts": 1
+   },
+   {
+    "id": "a2q4",
+    "lb": "Un client reçu en agence revient de lui-même un mois plus tard.",
+    "options": [
+     "Démarchage",
+     "Pas de démarchage"
+    ],
+    "rep": 1,
+    "pts": 1
+   },
+   {
+    "id": "a2q5",
+    "lb": "Un vendeur de cuisines appelle d'anciens prospects pour leur proposer un financement.",
+    "options": [
+     "Démarchage",
+     "Pas de démarchage"
+    ],
+    "rep": 0,
+    "pts": 1
+   }
+  ]
+ },
+ {
+  "titre": "Atelier 4 — Ce que vous dites au client",
+  "sub": "Obligatoire ou interdit · 6 propos",
+  "consigne": "Pour chaque propos d'une mandataire exclusive au premier rendez-vous, dites s'il est obligatoire ou interdit.",
+  "champs": [
+   {
+    "id": "a3q0",
+    "lb": "« Voici mon numéro d'immatriculation à l'ORIAS et ma catégorie. »",
+    "options": [
+     "Information obligatoire",
+     "Propos interdit"
+    ],
+    "rep": 0,
+    "pts": 1
+   },
+   {
+    "id": "a3q1",
+    "lb": "« Je vais comparer les offres de plusieurs banques pour vous. »",
+    "options": [
+     "Information obligatoire",
+     "Propos interdit"
+    ],
+    "rep": 1,
+    "pts": 1
+   },
+   {
+    "id": "a3q2",
+    "lb": "« Je travaille en exclusivité avec cette banque pour le crédit immobilier. »",
+    "options": [
+     "Information obligatoire",
+     "Propos interdit"
+    ],
+    "rep": 0,
+    "pts": 1
+   },
+   {
+    "id": "a3q3",
+    "lb": "« Vous me réglerez mes frais à la signature du compromis. »",
+    "options": [
+     "Information obligatoire",
+     "Propos interdit"
+    ],
+    "rep": 1,
+    "pts": 1
+   },
+   {
+    "id": "a3q4",
+    "lb": "« En cas de réclamation, voici la procédure et les coordonnées de l'ACPR. »",
+    "options": [
+     "Information obligatoire",
+     "Propos interdit"
+    ],
+    "rep": 0,
+    "pts": 1
+   },
+   {
+    "id": "a3q5",
+    "lb": "« Avec votre profil, l'accord est certain. »",
+    "options": [
+     "Information obligatoire",
+     "Propos interdit"
+    ],
+    "rep": 1,
+    "pts": 1
+   }
+  ]
+ },
+ {
+  "titre": "Atelier 5 — Avec vos mots",
+  "sub": "Restitution écrite · 2 questions · non notée",
+  "consigne": "Répondez sans la fiche mémo, en quelques lignes. Après validation, comparez avec la réponse modèle et cochez les points que vous aviez donnés.",
+  "redac": [
+   {
+    "q": "Une collègue mandataire exclusive vous dit : « Je ne suis pas assujettie à la LCB-FT, je n'ai donc rien à surveiller. » Que lui répondez-vous ?",
+    "modele": "Elle n'est pas assujettie directement, faute de mandat client et de fonds confiés. Mais son mandant l'est, et sa procédure lui impose de recueillir la connaissance client et de remonter toute anomalie. Elle est le premier maillon : sa responsabilité reste entière.",
+    "points": [
+     "Non assujettie directement : pas de mandat client ni de fonds confiés",
+     "Son mandant est assujetti et sa procédure s'impose à elle",
+     "Elle doit remonter les anomalies : non assujettie ne veut pas dire non concernée"
+    ]
+   },
+   {
+    "q": "Citez les trois documents d'un premier rendez-vous et dites, pour chacun, à quoi il sert.",
+    "modele": "Le mandat, qui fixe le cadre de l'intervention. L'information précontractuelle, remise sur support durable avec accusé de réception, qui prouve que le client a été informé. La fiche de recueil des besoins, signée par le client, base et preuve du devoir de conseil.",
+    "points": [
+     "Le mandat : le cadre de l'intervention",
+     "L'information précontractuelle, avec accusé de réception",
+     "La fiche de recueil signée : la preuve du devoir de conseil"
+    ]
+   }
+  ]
+ }
+];
+const REFLEXES = "① Non assujetti ne veut pas dire non concerné : d'où vient l'apport ? ② Le soupçon suffit, et ne se dit jamais au client. ③ Tout ce que vous devez dire, dites-le par écrit avant de commencer — la phrase conforme est aussi la plus crédible.";
+
+const TOTAL = EX.reduce((s,a)=>s+(a.redac?0:a.champs.reduce((t,c)=>t+c.pts,0)),0);
+const NOTES = EX.filter(a=>!a.redac).length;
+const etat = EX.map(()=>({valide:false,score:0,auto:null}));
+const MIN = 40;
+function phrase(lb){ return lb.replace('…','<span class="trou">…</span>'); }
+function rendre(){
+  document.getElementById('ateliers').innerHTML = EX.map((a,i)=>{
+    if(a.redac){
+      return `<h2><span class="num">${i+1} ·</span>${a.titre}</h2>
+      <div class="carte" id="at${i}"><p style="font-size:14.5px;color:var(--gris-moyen);margin-top:0">${a.sub}</p>
+      <div class="situ">${a.consigne}</div>
+      ${a.redac.map((r,k)=>`<div class="qbloc"><div class="qr">${r.q}</div>
+        <textarea class="redac" id="r${i}_${k}" rows="4" placeholder="Votre réponse, avec vos mots…"></textarea>
+        <div class="cpt" id="cpt${i}_${k}">0 caractère — ${MIN} au minimum</div>
+        <div class="modele" id="m${i}_${k}"><div class="enc"><span class="t">RÉPONSE MODÈLE</span>${r.modele}</div>
+        <div class="auto"><div class="multi">Cochez les points que votre réponse contenait :</div>
+        ${r.points.map((p,j)=>`<label><input type="checkbox" id="p${i}_${k}_${j}"> ${p}</label>`).join('')}</div></div></div>`).join('')}
+      <div class="barre"><button class="btn" id="btn${i}">Valider mes réponses</button>
+        <span class="pts">Atelier non noté : auto-évaluation</span><span id="fige${i}"></span></div></div>`;
+    }
+    const pts = a.champs.reduce((t,c)=>t+c.pts,0);
+    return `
+    <h2><span class="num">${i+1} ·</span>${a.titre}</h2>
+    <div class="carte" id="at${i}">
+      <p style="font-size:14.5px;color:var(--gris-moyen);margin-top:0">${a.sub}</p>
+      <div class="situ">${a.consigne}</div>
+      ${a.champs.map(c=>`
+        <div class="champ" id="ch_${c.id}">
+          <span class="phrase">${phrase(c.lb)}</span>
+          <select class="ch" id="${c.id}"><option value="">— choisir —</option>${c.options.map((o,j)=>`<option value="${j}">${o}</option>`).join('')}</select>
+          <span class="pts">${c.pts} pt</span>
+          <span class="verdict" id="v_${c.id}"></span>
+        </div>`).join('')}
+      <div class="barre">
+        <button class="btn" id="btn${i}">Valider l'atelier ${i+1}</button>
+        <span class="pts">Atelier noté sur ${pts} points</span>
+        <span id="fige${i}"></span>
+      </div>
+    </div>`;
+  }).join('');
+  EX.forEach((a,i)=>{
+    document.getElementById('btn'+i).addEventListener('click',()=>valider(i));
+    if(a.redac) a.redac.forEach((r,k)=>document.getElementById(`r${i}_${k}`).addEventListener('input',e=>{
+      const n=e.target.value.trim().length;
+      document.getElementById(`cpt${i}_${k}`).textContent = n+(n>1?' caractères':' caractère')+(n<MIN?' — encore '+(MIN-n):' — longueur suffisante');}));
+  });
+}
+function valider(i){
+  if(etat[i].valide) return;
+  const a = EX[i];
+  if(a.redac){
+    for(let k=0;k<a.redac.length;k++){ const el=document.getElementById(`r${i}_${k}`);
+      if(el.value.trim().length<MIN){ alert('Rédigez au moins '+MIN+' caractères pour chaque question avant de valider.'); el.focus(); return; } }
+    a.redac.forEach((r,k)=>{ document.getElementById(`r${i}_${k}`).disabled=true; document.getElementById(`m${i}_${k}`).classList.add('on'); });
+    etat[i] = {valide:true, score:0, auto:'en_cours'};
+    const b=document.getElementById('btn'+i); b.textContent="Valider mon auto-évaluation";
+    b.onclick=null; b.replaceWith(b.cloneNode(true));
+    document.getElementById('btn'+i).addEventListener('click',()=>{
+      let n=0,t=0; a.redac.forEach((r,k)=>r.points.forEach((p,j)=>{t++; const c=document.getElementById(`p${i}_${k}_${j}`); if(c.checked)n++; c.disabled=true;}));
+      etat[i].auto=n+' / '+t; const bb=document.getElementById('btn'+i); bb.textContent='Atelier validé'; bb.disabled=true;
+      document.getElementById('fige'+i).innerHTML='<span class="fige">Réponses figées</span>'; bilan(); });
+    return;
+  }
+  for(const c of a.champs){
+    const el = document.getElementById(c.id);
+    if(el.value===''){ alert("Répondez à toutes les lignes de l'atelier avant de valider."); el.focus(); return; }
+  }
+  let score = 0;
+  a.champs.forEach(c=>{
+    const el = document.getElementById(c.id);
+    const juste = parseInt(el.value,10) === c.rep;
+    if(juste) score += c.pts;
+    el.disabled = true;
+    document.getElementById('ch_'+c.id).classList.add(juste?'just':'faux');
+    const v = document.getElementById('v_'+c.id);
+    v.className = 'verdict ' + (juste?'ok':'ko');
+    v.textContent = juste ? '✓ juste' : '✗ attendu : ' + c.options[c.rep];
+  });
+  etat[i] = {valide:true, score:score};
+  const b = document.getElementById('btn'+i);
+  b.textContent = 'Atelier validé'; b.disabled = true;
+  document.getElementById('fige'+i).innerHTML = '<span class="fige">Réponses figées</span>';
+  bilan();
+}
+function bilan(){
+  const faits = etat.filter(e=>e.valide && e.auto!=='en_cours').length;
+  if(faits < EX.length){
+    document.getElementById('final').innerHTML =
+      `<div class="carte"><div class="enc"><span class="t">AVANCEMENT</span>${faits} atelier${faits>1?'s':''} sur ${EX.length} validé${faits>1?'s':''}.</div></div>`;
+    return;
+  }
+  const s = etat.reduce((t,e)=>t+e.score,0);
+  const pct = Math.round(s/TOTAL*100);
+  let mot;
+  if(pct>=90) mot = "Les notions du module sont en place. Vous pouvez passer au QCM.";
+  else if(pct>=70) mot = "L'essentiel est acquis. Relisez dans la fiche mémo la partie de l'atelier où vous avez perdu le plus de points, puis passez au QCM.";
+  else if(pct>=50) mot = "Plusieurs notions restent fragiles. Reprenez la fiche mémo et l'exemple commenté, refaites l'exercice, puis passez au QCM.";
+  else mot = "Reprenez la vidéo et la fiche mémo avant de refaire l'exercice.";
+  document.getElementById('final').innerHTML = `
+   <h2><span class="num">${EX.length+1} ·</span>Votre bilan</h2>
+   <div class="score"><span class="gros">${s} / ${TOTAL}</span><span class="lib">${pct} % — ${NOTES} ateliers notés</span></div>
+   <div class="carte">
+    <table><thead><tr><th>Atelier</th><th>Résultat</th></tr></thead><tbody>
+    ${EX.map((a,i)=>`<tr><td>${a.titre}</td><td class="n">${a.redac?('auto-évaluation : '+etat[i].auto+' points'):(etat[i].score+' / '+a.champs.reduce((t,c)=>t+c.pts,0))}</td></tr>`).join('')}
+    <tr class="tot"><td>Total des ateliers notés</td><td class="n">${s} / ${TOTAL}</td></tr>
+    </tbody></table>
+    <div class="enc"><span class="t">CE QUE VOUS EN FAITES</span>${mot}</div>
+    <div class="enc ci"><span class="t">LES TROIS RÉFLEXES DU MODULE</span>${REFLEXES}</div>
+   </div>`;
+}
+document.getElementById('rejouer').addEventListener('click',()=>{ location.reload(); });
+rendre();
+</script>
+</body></html>
